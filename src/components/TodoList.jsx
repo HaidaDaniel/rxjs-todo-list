@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { List, TextField, Button, Grid } from '@mui/material'
 import { useObservableState } from 'observable-hooks'
-import { map } from 'rxjs/operators'
 import { useTodos } from '../store'
 
 import TodoItem from './TodoItem'
@@ -15,23 +14,22 @@ function TodoList() {
   const todos = useObservableState(todos$, [])
   const completedTodos = useObservableState(completedTodos$, [])
   const uncompletedTodos = useObservableState(uncompletedTodos$, [])
-  console.log(todos)
-  const removeTodo = (index) => {
-    todos$.next(todos$.value.filter((_, i) => i !== index))
+
+  const removeTodo = (id) => {
+    todos$.next(todos$.value.filter((todo) => todo.id !== id))
   }
 
   const addTodoItem = () => {
     if (inputValue.trim() !== '') {
-      todos$.next([
-        ...todos$.value,
-        { id: Date.now(), text: inputValue, completed: false },
-      ])
+      const newTodo = { id: Date.now(), text: inputValue, completed: false }
+      todos$.next([...todos$.value, newTodo])
       setInputValue('')
     }
   }
-  const toggleTodoComplete = (index) => {
-    const updatedTodos = todos.map((todo, i) => {
-      if (i === index) {
+
+  const toggleTodoComplete = (id) => {
+    const updatedTodos = todos.map((todo) => {
+      if (todo.id === id) {
         return { ...todo, completed: !todo.completed }
       }
       return todo
@@ -57,26 +55,30 @@ function TodoList() {
       </Grid>
       <Grid item xs={6}>
         <List>
-          {uncompletedTodos.map((todo, index) => (
+          <h3>Uncomplete Todos</h3>
+          {uncompletedTodos.map((todo) => (
             <TodoItem
               key={todo.id}
+              id={todo.id}
               text={todo.text}
               completed={todo.completed}
-              onToggleComplete={() => toggleTodoComplete(index)}
-              onDelete={() => removeTodo(index)}
+              onToggleComplete={() => toggleTodoComplete(todo.id)}
+              onDelete={() => removeTodo(todo.id)}
             />
           ))}
         </List>
       </Grid>
       <Grid item xs={6}>
         <List>
-          {completedTodos.map((todo, index) => (
+          <h3>Complete Todos</h3>
+          {completedTodos.map((todo) => (
             <TodoItem
               key={todo.id}
+              id={todo.id}
               text={todo.text}
               completed={todo.completed}
-              onToggleComplete={() => toggleTodoComplete(index)}
-              onDelete={() => removeTodo(index)}
+              onToggleComplete={() => toggleTodoComplete(todo.id)}
+              onDelete={() => removeTodo(todo.id)}
             />
           ))}
         </List>

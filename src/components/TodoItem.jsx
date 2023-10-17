@@ -17,7 +17,7 @@ const listItemStyle = {
   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
 }
 
-function TodoItem({ text, completed, onToggleComplete, onDelete }) {
+function TodoItem({ id, text, completed, onToggleComplete, onDelete }) {
   return (
     <ListItem style={listItemStyle}>
       <ListItemIcon>
