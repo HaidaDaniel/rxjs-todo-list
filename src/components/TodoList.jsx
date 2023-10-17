@@ -13,6 +13,8 @@ function TodoList() {
 
   const { todos$, completedTodos$, uncompletedTodos$ } = useTodos()
   const todos = useObservableState(todos$, [])
+  const completedTodos = useObservableState(completedTodos$, [])
+  const uncompletedTodos = useObservableState(uncompletedTodos$, [])
   console.log(todos)
   const removeTodo = (index) => {
     todos$.next(todos$.value.filter((_, i) => i !== index))
@@ -27,12 +29,21 @@ function TodoList() {
       setInputValue('')
     }
   }
+  const toggleTodoComplete = (index) => {
+    const updatedTodos = todos.map((todo, i) => {
+      if (i === index) {
+        return { ...todo, completed: !todo.completed }
+      }
+      return todo
+    })
+    todos$.next(updatedTodos)
+  }
 
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <TextField
-          label='Добавить новое задание'
+          label='add new todo'
           variant='outlined'
           fullWidth
           value={inputValue}
@@ -41,15 +52,30 @@ function TodoList() {
       </Grid>
       <Grid item xs={12}>
         <Button variant='contained' color='primary' onClick={addTodoItem}>
-          Добавить
+          Add
         </Button>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={6}>
         <List>
-          {todos.map((todo, index) => (
+          {uncompletedTodos.map((todo, index) => (
             <TodoItem
               key={todo.id}
               text={todo.text}
+              completed={todo.completed}
+              onToggleComplete={() => toggleTodoComplete(index)}
+              onDelete={() => removeTodo(index)}
+            />
+          ))}
+        </List>
+      </Grid>
+      <Grid item xs={6}>
+        <List>
+          {completedTodos.map((todo, index) => (
+            <TodoItem
+              key={todo.id}
+              text={todo.text}
+              completed={todo.completed}
+              onToggleComplete={() => toggleTodoComplete(index)}
               onDelete={() => removeTodo(index)}
             />
           ))}
